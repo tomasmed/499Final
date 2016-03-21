@@ -7,10 +7,12 @@ public class MovementV2 : MonoBehaviour {
 	public float speed = 1f; //Speed multiplier by which the character will move
 	public float JumpPower = 20;
 
+
 	public bool _______________________;
 
 	private float HorizIn = 0f; //Variable to hold the Horizontal Input from player
 	private float VertIn = 0f; //Variable to hold the Vertical Input from player
+	private bool GlideIn;
 	private bool JumpIn;
 
 	//Rotation variables
@@ -23,7 +25,7 @@ public class MovementV2 : MonoBehaviour {
 	private Vector3 CamRelative;
 
 	//Jump Variables
-	public bool grounded = true;
+	public int grounded = 2;
 
 	//---------------------------------End of Variables
 
@@ -34,7 +36,7 @@ public class MovementV2 : MonoBehaviour {
 	void OnCollisionEnter(Collision coll)
 	{
 		Debug.Log ("Collided with Something");
-		if (coll.gameObject.tag == "Ground")grounded = true;
+		if (coll.gameObject.tag == "Ground")grounded = 2;
 	}
 	
 	// Update is called once per frame
@@ -43,6 +45,7 @@ public class MovementV2 : MonoBehaviour {
 		HorizIn = Input.GetAxis ("Horizontal");
 		VertIn = Input.GetAxis("Vertical");
 		JumpIn = Input.GetKeyDown (KeyCode.Space);
+		GlideIn = Input.GetKeyDown (KeyCode.E);
 		//Debug.Log ("Vertical and Horizontal Inputs are: " + VertIn + " , " + HorizIn);
 		//
 
@@ -82,12 +85,16 @@ public class MovementV2 : MonoBehaviour {
 		}
 
 		//Check for input on jumping and Jump if appropriate
-		if (JumpIn && grounded)
+		if (JumpIn && (grounded > 0))
 		{
 			Debug.Log ("Jumping!");
 			Vector3 temp = gameObject.GetComponent<Rigidbody>().velocity;
 			gameObject.GetComponent<Rigidbody> ().velocity = new Vector3 (temp.x, JumpPower, temp.z);
-			grounded = false;
+			grounded -= 1;
+			if (GlideIn)
+			{
+				gameObject.GetComponent<Rigidbody>().velocity = gameObject.GetComponent<Rigidbody>().velocity; 
+			}
 		}
 		gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 		//Debug.Log (gameObject.GetComponent<Rigidbody> ().velocity);
